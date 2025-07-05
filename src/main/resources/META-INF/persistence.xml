@@ -11,11 +11,15 @@
         <class>org.example.entity.Interval</class>
 
         <properties>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/space_reservation_app"/>
+            <property name="jakarta.persistence.jdbc.user" value="${DB_USERNAME}"/>
+            <property name="jakarta.persistence.jdbc.password" value="${DB_PASSWORD}"/>
+
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
         </properties>
-
     </persistence-unit>
 </persistence>
