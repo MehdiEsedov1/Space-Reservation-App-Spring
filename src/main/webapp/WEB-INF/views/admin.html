@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Space Reservation Application | Admin Console</title>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="navbar bg-body-secondary p-2">
+    <div class="container">
+        <p class="navbar-brand">Space Reservation Application</p>
+        <div class="d-flex">
+            <a class="btn btn-outline-danger" th:href="@{/login}"><i class="bi bi-box-arrow-left"></i></a>
+        </div>
+    </div>
+</div>
+<div class="container mt-2">
+    <h1 class="mt-2">Workspaces</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th>Address</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${workspaces.empty}">
+            <td colspan="6">No workspaces found</td>
+        </tr>
+        <tr th:each="workspace : ${workspaces}">
+            <td th:text="${workspace.id}"></td>
+            <td th:text="${workspace.name}"></td>
+            <td th:text="${workspace.type}"></td>
+            <td th:text="${workspace.price}"></td>
+            <td th:text="${workspace.address}"></td>
+            <td>
+                <form method="post" th:action="@{/admin/delete(id=${workspace.id})}">
+                    <button class="btn btn-outline-warning" data-bs-toggle="modal"
+                            th:data-bs-target="@{'#editWorkspaceModal' + ${workspace.id}}" type="button">
+                        <i class="bi bi-pen"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" type="submit"><i class="bi bi-trash"></i></button>
+                </form>
+                <div aria-hidden="true" class="modal fade" tabindex="-1"
+                     th:aria-labelledby="@{'editWorkspaceTitle' + ${workspace.id}}"
+                     th:id="@{'editWorkspaceModal' + ${workspace.id}}">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" th:id="@{'editWorkspaceTitle' + ${workspace.id}}"
+                                    th:text="@{'Edit Workspace #' + ${workspace.id}}"></h5>
+                                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                            </div>
+                            <form method="post" th:action="@{/admin/update(id=${workspace.id})}">
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <label class="form-label" th:for="@{'editWorkspaceName' + ${workspace.id}}">Name</label>
+                                            <input class="form-control" name="name" placeholder="Workspace Name" required
+                                                   th:id="@{'editWorkspaceName' + ${workspace.id}}"
+                                                   th:value="${workspace.name}" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col">
+                                            <label class="form-label" th:for="@{'editWorkspaceType' + ${workspace.id}}">Type</label>
+                                            <select class="form-select" name="type" required
+                                                    th:id="@{'editWorkspaceType' + ${workspace.id}}">
+                                                <option th:value="OPEN" th:selected="${workspace.type.name() == 'OPEN'}">Open</option>
+                                                <option th:value="PRIVATE" th:selected="${workspace.type.name() == 'PRIVATE'}">Private</option>
+                                                <option th:value="ROOM" th:selected="${workspace.type.name() == 'ROOM'}">Room</option>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label" th:for="@{'editWorkspacePrice' + ${workspace.id}}">Price</label>
+                                            <input class="form-control" name="price" placeholder="0.00" required
+                                                   th:id="@{'editWorkspacePrice' + ${workspace.id}}"
+                                                   th:value="${workspace.price}" type="text"/>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col">
+                                            <label class="form-label" th:for="@{'editWorkspaceAddress' + ${workspace.id}}">Address</label>
+                                            <input class="form-control" name="address" placeholder="Workspace Address" required
+                                                   th:id="@{'editWorkspaceAddress' + ${workspace.id}}"
+                                                   th:value="${workspace.address}" type="text"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-outline-success" type="submit">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <a class="btn btn-outline-success" data-bs-target="#createWorkspace" data-bs-toggle="modal">Add Workspace</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <h1 class="mt-2">Reservations</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Workspace</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${reservations.empty}">
+            <td colspan="5">No reservation made yet</td>
+        </tr>
+        <tr th:each="reservation : ${reservations}">
+            <td th:text="${reservation.id}"></td>
+            <td th:text="${reservation.name}"></td>
+            <td th:text="${reservation.workspace.name}"></td>
+            <td th:text="${reservation.interval.startTime}"></td>
+            <td th:text="${reservation.interval.endTime}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div aria-hidden="true" aria-labelledby="createWorkspaceTitle" class="modal fade" id="createWorkspace" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createWorkspaceTitle">Create Workspace</h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <form method="post" th:action="@{/admin/create}">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label" for="workspaceName">Name</label>
+                            <input class="form-control" id="workspaceName" name="name" placeholder="Workspace Name" required type="text"/>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col">
+                            <label class="form-label" for="workspaceType">Type</label>
+                            <select class="form-select" id="workspaceType" name="type" required>
+                                <option value="OPEN">Open</option>
+                                <option value="PRIVATE">Private</option>
+                                <option value="ROOM">Room</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label class="form-label" for="workspacePrice">Price</label>
+                            <input class="form-control" id="workspacePrice" name="price" placeholder="0.00" required type="text"/>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col">
+                            <label class="form-label" for="workspaceAddress">Address</label>
+                            <input class="form-control" id="workspaceAddress" name="address" placeholder="Workspace Address" required type="text"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-success" type="submit">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal" id="successModal" th:if="${success}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5"><i class="bi bi-check-circle text-success"></i> Success</h1>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p th:text="${success}"></p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="errorModal" th:if="${error}">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5"><i class="bi bi-exclamation-octagon text-danger"></i> Error</h1>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p th:text="${error}"></p>
+            </div>
+        </div>
+    </div>
+</div>
+<script crossorigin="anonymous"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        if (document.getElementById('successModal') !== null) {
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+        }
+        if (document.getElementById('errorModal') !== null) {
+            const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+            errorModal.show();
+        }
+    });
+</script>
+</body>
+</html>
